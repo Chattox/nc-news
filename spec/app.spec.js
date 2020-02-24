@@ -1,5 +1,5 @@
 const request = require('supertest');
-const chai = require('chai');
+const { expect } = require('chai');
 const app = require('../app');
 const connection = require('../db/connection');
 
