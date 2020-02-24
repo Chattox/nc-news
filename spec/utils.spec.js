@@ -127,4 +127,84 @@ describe('makeRefObj', () => {
   });
 });
 
-describe('formatComments', () => {});
+describe.only('formatComments', () => {
+  it('takes an array and ref obj, returns a new array', () => {
+    const input = [];
+    const refObj = {};
+    const actual = formatComments(input, refObj);
+    expect(actual).to.be.an('array');
+    expect(actual).to.not.equal(input);
+  });
+  it('takes an array of a single comment obj and a refObj, returns a new array with properly formatted comment', () => {
+    const input = [
+      {
+        body: 'body',
+        belongs_to: 'title',
+        created_by: 'username',
+        votes: 0,
+        created_at: 1468087638932
+      }
+    ];
+    const refObj = { title: 1 };
+    const actual = formatComments(input, refObj);
+    const date = new Date(1468087638932);
+    expect(actual[0]).to.have.keys(
+      'body',
+      'author',
+      'article_id',
+      'created_at',
+      'votes'
+    );
+    expect(actual[0].votes).to.eql(input[0].votes);
+    expect(actual[0].body).to.eql(input[0].body);
+    expect(actual[0].author).to.eql(input[0].created_by);
+    expect(actual[0].article_id).to.eql(1);
+    expect(actual[0].created_at).to.eql(date);
+    expect(actual).to.not.equal(input);
+  });
+  it('takes an array of multiuple comment objs and a refObj, returns new array with properly formatted comment objs', () => {
+    const input = [
+      {
+        body: 'body',
+        belongs_to: 'title',
+        created_by: 'username',
+        votes: 0,
+        created_at: 1468087638932
+      },
+      {
+        body: 'test body',
+        belongs_to: 'hello world',
+        created_by: 'username2',
+        votes: 5,
+        created_at: 1478813209256
+      },
+      {
+        body: 'second test body',
+        belongs_to: 'a different title',
+        created_by: 'test_username',
+        votes: 11,
+        created_at: 1504183900263
+      }
+    ];
+    const refObj = { title: 1, 'hello world': 2, 'a different title': 3 };
+    const actual = formatComments(input, refObj);
+
+    expect(actual.length).to.eql(input.length);
+    actual.forEach((comment, i) => {
+      const date = new Date(input[i].created_at);
+      expect(comment).to.have.keys(
+        'body',
+        'author',
+        'article_id',
+        'created_at',
+        'votes'
+      );
+      expect(comment.votes).to.eql(input[i].votes);
+      expect(comment.body).to.eql(input[i].body);
+      expect(comment.author).to.eql(input[i].created_by);
+      expect(comment.article_id).to.eql(refObj[input[i].belongs_to]);
+      expect(comment.created_at).to.eql(date);
+    });
+    expect(actual).to.not.equal(input);
+  });
+});
