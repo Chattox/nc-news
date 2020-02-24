@@ -14,6 +14,19 @@ exports.formatDates = list => {
   return newList;
 };
 
-exports.makeRefObj = list => {};
+exports.makeRefObj = list => {
+  // If list empty, return empty obj
+  if (list.length === 0) {
+    return {};
+  }
+  // Create ref obj
+  const refObj = {};
+  // Loop thru array, create title:article_id key/value pair from each and add to object
+  list.forEach(obj => {
+    refObj[obj.title] = obj.article_id;
+  });
+
+  return refObj;
+};
 
 exports.formatComments = (comments, articleRef) => {};

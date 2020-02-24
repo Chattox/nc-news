@@ -68,6 +68,63 @@ describe('formatDates', () => {
   });
 });
 
-describe('makeRefObj', () => {});
+describe('makeRefObj', () => {
+  it('takes an array and returns an object', () => {
+    const input = [];
+    expect(makeRefObj(input)).to.be.an('object');
+  });
+  it('when passed an array of a single obj, returns an obj with a single key value pair (title : id)', () => {
+    const input = [
+      {
+        article_id: 1,
+        title: 'hello',
+        body: 'body',
+        votes: 0,
+        topic: 'topic',
+        author: 'author',
+        created_at: 0
+      }
+    ];
+    const actual = makeRefObj(input);
+    const expected = { hello: 1 };
+
+    expect(actual).to.eql(expected);
+  });
+  it('when passed an array of multiple objs, returns an obj with multiple key value pairs (title: id)', () => {
+    const input = [
+      {
+        article_id: 1,
+        title: 'hello',
+        body: 'body',
+        votes: 0,
+        topic: 'topic',
+        author: 'author',
+        created_at: 0
+      },
+      {
+        article_id: 2,
+        title: 'world',
+        body: 'body',
+        votes: 0,
+        topic: 'topic',
+        author: 'author',
+        created_at: 0
+      },
+      {
+        article_id: 3,
+        title: 'test',
+        body: 'body',
+        votes: 0,
+        topic: 'topic',
+        author: 'author',
+        created_at: 0
+      }
+    ];
+    const actual = makeRefObj(input);
+    const expected = { hello: 1, world: 2, test: 3 };
+
+    expect(actual).to.eql(expected);
+  });
+});
 
 describe('formatComments', () => {});
