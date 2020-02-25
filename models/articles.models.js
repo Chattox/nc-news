@@ -25,7 +25,11 @@ const updateArticleVotes = (article_id, votes) => {
     .increment('votes', votes.inc_votes)
     .returning('*')
     .then(article => {
-      return article[0];
+      if (article.length > 0) {
+        return article[0];
+      } else {
+        return Promise.reject({ status: 404, msg: '404 not found' });
+      }
     });
 };
 

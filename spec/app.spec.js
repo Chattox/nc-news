@@ -114,6 +114,26 @@ describe('/api', () => {
               expect(res.body.article.votes).to.eql(95);
             });
         });
+        describe('PATCH errors', () => {
+          it('PATCH: 404 - responds with 404 when attempting to patch an article that does not exist', () => {
+            return request(app)
+              .patch('/api/articles/99999')
+              .send({ inc_votes: -5 })
+              .expect(404)
+              .then(res => {
+                expect(res.body.msg).to.eql('404 not found');
+              });
+          });
+          it('PATCH: 400 - responds with 400 when given article_id of wrong data type', () => {
+            return request(app)
+              .patch('/api/articles/not-valid-id')
+              .send({ inc_votes: -5 })
+              .expect(400)
+              .then(res => {
+                expect(res.body.msg).to.eql('400 bad request');
+              });
+          });
+        });
       });
     });
   });
