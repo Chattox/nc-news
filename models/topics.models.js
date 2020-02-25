@@ -1,6 +1,6 @@
 const connection = require('../db/connection');
 
-const fetchAllTopics = () => {
+const selectAllTopics = () => {
   return connection('topics')
     .select('*')
     .then(result => {
@@ -8,4 +8,4 @@ const fetchAllTopics = () => {
     });
 };
 
-module.exports = { fetchAllTopics };
+module.exports = { selectAllTopics };
