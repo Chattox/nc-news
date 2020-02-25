@@ -24,7 +24,7 @@ describe('/api', () => {
   });
   describe('/users', () => {
     describe('/:username', () => {
-      describe('GET', () => {
+      describe.only('GET', () => {
         it('GET: 200 - responds with a user object based on given username containing username, avatar_url, and name properties', () => {
           return request(app)
             .get('/api/users/butter_bridge')
@@ -38,6 +38,16 @@ describe('/api', () => {
               ]);
               expect(res.body.user.username).to.eql('butter_bridge');
             });
+        });
+        describe('GET errors', () => {
+          it('GET: 404 - responds with 404 when no user is found with given username', () => {
+            return request(app)
+              .get('/api/users/chattox')
+              .expect(404)
+              .then(res => {
+                expect(res.body.msg).to.eql('404 not found');
+              });
+          });
         });
       });
     });

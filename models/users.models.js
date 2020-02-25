@@ -5,7 +5,11 @@ const selectUserByUsername = username => {
     .where({ username })
     .select('*')
     .then(result => {
-      return result[0];
+      if (result.length === 0) {
+        return Promise.reject({ status: 404, msg: '404 not found' });
+      } else {
+        return result[0];
+      }
     });
 };
 
