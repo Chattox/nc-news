@@ -95,6 +95,26 @@ describe('/api', () => {
           });
         });
       });
+      describe('PATCH', () => {
+        it('PATCH: 200 - responds with 200 and updated article when given vote increment object in the form of {inc_votes: newVote}', () => {
+          return request(app)
+            .patch('/api/articles/1')
+            .send({ inc_votes: 5 })
+            .expect(200)
+            .then(res => {
+              expect(res.body.article.votes).to.eql(105);
+            });
+        });
+        it('PATCH: 200 - also correctly decrements vote property when inc_votes is negative', () => {
+          return request(app)
+            .patch('/api/articles/1')
+            .send({ inc_votes: -5 })
+            .expect(200)
+            .then(res => {
+              expect(res.body.article.votes).to.eql(95);
+            });
+        });
+      });
     });
   });
 });
