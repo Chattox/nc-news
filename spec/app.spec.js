@@ -1,3 +1,4 @@
+process.env.NODE_ENV = 'test';
 const request = require('supertest');
 const { expect } = require('chai');
 const app = require('../app');
@@ -13,6 +14,7 @@ describe('/api', () => {
           .get('/api/topics')
           .expect(200)
           .then(response => {
+            console.log(response.body.topics);
             expect(response.body.topics).to.be.an('array');
             response.body.topics.forEach(topic => {
               expect(topic).to.have.keys(['slug', 'description']);
