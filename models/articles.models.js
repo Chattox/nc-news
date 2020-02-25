@@ -50,4 +50,22 @@ const insertComment = (article_id, comment) => {
     });
 };
 
-module.exports = { selectArticleByID, updateArticleVotes, insertComment };
+const selectComments = (article_id, queryObj) => {
+  return connection('comments')
+    .where({ article_id })
+    .select('*')
+    .orderBy(queryObj.sort_by || 'created_at', queryObj.order || 'desc')
+    .then(comments => {
+      comments.forEach(comment => {
+        delete comment.article_id;
+      });
+      return comments;
+    });
+};
+
+module.exports = {
+  selectArticleByID,
+  updateArticleVotes,
+  insertComment,
+  selectComments
+};

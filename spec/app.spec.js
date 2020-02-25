@@ -1,6 +1,8 @@
 process.env.NODE_ENV = 'test';
 const request = require('supertest');
-const { expect } = require('chai');
+const chai = require('chai');
+const expect = chai.expect;
+chai.use(require('sams-chai-sorted'));
 const app = require('../app');
 const connection = require('../db/connection');
 
@@ -52,7 +54,7 @@ describe('/api', () => {
       });
     });
   });
-  describe.only('/articles', () => {
+  describe('/articles', () => {
     describe('/:article_id', () => {
       describe('GET', () => {
         it('GET: 200 - responds with an article object according to given article_id, with correct properties', () => {
@@ -156,7 +158,7 @@ describe('/api', () => {
                 expect(res.body.comment.article_id).to.eql(1);
               });
           });
-          describe.only('POST errors', () => {
+          describe('POST errors', () => {
             it('POST: 404 - responds with 404 when attempting to comment on an article that does not exist', () => {
               return request(app)
                 .post('/api/articles/99999/comments')
@@ -175,6 +177,55 @@ describe('/api', () => {
                   expect(res.body.msg).to.eql('400 bad request');
                 });
             });
+          });
+        });
+        describe.only('GET', () => {
+          it('GET: 200 - responds with 200 and an array of comments for given article with correct properties', () => {
+            return request(app)
+              .get('/api/articles/1/comments')
+              .expect(200)
+              .then(res => {
+                expect(res.body.comments).to.be.an('array');
+                res.body.comments.forEach(comment => {
+                  expect(comment).to.have.keys([
+                    'comment_id',
+                    'votes',
+                    'created_at',
+                    'author',
+                    'body'
+                  ]);
+                });
+              });
+          });
+          it('GET: 200 - accepts sort_by query (default created_at), sorts by any valid column', () => {
+            return request(app)
+              .get('/api/articles/1/comments?sort_by=author')
+              .expect(200)
+              .then(res => {
+                expect(res.body.comments).to.be.sortedBy('author', {
+                  descending: true
+                });
+              });
+          });
+          it('GET: 200 - accepts order query (default descending), decides order of sorting', () => {
+            return request(app)
+              .get('/api/articles/1/comments?order=asc')
+              .expect(200)
+              .then(res => {
+                expect(res.body.comments).to.be.sortedBy('created_at', {
+                  descending: false
+                });
+              });
+          });
+          it('GET: 200 - successfully handles both queries simultaneously', () => {
+            return request(app)
+              .get('/api/articles/1/comments?sort_by=author&order=asc')
+              .expect(200)
+              .then(res => {
+                expect(res.body.comments).to.be.sortedBy('author', {
+                  descending: false
+                });
+              });
           });
         });
       });
