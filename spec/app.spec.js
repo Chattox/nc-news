@@ -156,6 +156,26 @@ describe('/api', () => {
                 expect(res.body.comment.article_id).to.eql(1);
               });
           });
+          describe.only('POST errors', () => {
+            it('POST: 404 - responds with 404 when attempting to comment on an article that does not exist', () => {
+              return request(app)
+                .post('/api/articles/99999/comments')
+                .send({ username: 'butter_bridge', body: 'Very good!' })
+                .expect(404)
+                .then(res => {
+                  expect(res.body.msg).to.eql('404 not found');
+                });
+            });
+            it('POST: 400 - responds with 400 when given bad article_id data type', () => {
+              return request(app)
+                .post('/api/articles/not-valid-id/comments')
+                .send({ username: 'butter_bridge', body: 'Very good!' })
+                .expect(400)
+                .then(res => {
+                  expect(res.body.msg).to.eql('400 bad request');
+                });
+            });
+          });
         });
       });
     });

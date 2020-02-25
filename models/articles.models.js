@@ -44,6 +44,9 @@ const insertComment = (article_id, comment) => {
     .returning('*')
     .then(comment => {
       return comment[0];
+    })
+    .catch(err => {
+      return Promise.reject(err);
     });
 };
 
