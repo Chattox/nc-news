@@ -76,6 +76,24 @@ describe('/api', () => {
               expect(res.body.article.comment_count).to.eql(13);
             });
         });
+        describe('GET errors', () => {
+          it('GET: 404 - responds with 404 when no article exists under given valid id', () => {
+            return request(app)
+              .get('/api/articles/99999')
+              .expect(404)
+              .then(res => {
+                expect(res.body.msg).to.eql('404 not found');
+              });
+          });
+          it('GET: 400 - responds with 400 when given an id of incorrect data type', () => {
+            return request(app)
+              .get('/api/articles/not-valid-id')
+              .expect(400)
+              .then(res => {
+                expect(res.body.msg).to.eql('400 bad request');
+              });
+          });
+        });
       });
     });
   });

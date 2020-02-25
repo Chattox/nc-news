@@ -6,8 +6,18 @@ const handleCustomErrors = (err, req, res, next) => {
   }
 };
 
+const handlePSQLErrors = (err, req, res, next) => {
+  if (err.code !== undefined) {
+    if (err.code === '22P02') {
+      res.status(400).send({ msg: '400 bad request' });
+    }
+  } else {
+    next(err);
+  }
+};
+
 const handle500Errors = (err, req, res, next) => {
   res.status(500).send({ msg: '500 internal server error' });
 };
 
-module.exports = { handleCustomErrors, handle500Errors };
+module.exports = { handleCustomErrors, handlePSQLErrors, handle500Errors };
