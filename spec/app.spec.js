@@ -55,6 +55,28 @@ describe('/api', () => {
     });
   });
   describe('/articles', () => {
+    describe.only('GET', () => {
+      it('GET: 200 - responds with an array of article objects with the correct properties', () => {
+        return request(app)
+          .get('/api/articles')
+          .expect(200)
+          .then(res => {
+            expect(res.body.articles).to.be.an('array');
+            res.body.articles.forEach(article => {
+              expect(article).to.have.keys([
+                'author',
+                'title',
+                'article_id',
+                'topic',
+                'created_at',
+                'votes',
+                'comment_count'
+              ]);
+              expect(article.comment_count).to.be.a('number');
+            });
+          });
+      });
+    });
     describe('/:article_id', () => {
       describe('GET', () => {
         it('GET: 200 - responds with an article object according to given article_id, with correct properties', () => {
@@ -179,7 +201,7 @@ describe('/api', () => {
             });
           });
         });
-        describe.only('GET', () => {
+        describe('GET', () => {
           it('GET: 200 - responds with 200 and an array of comments for given article with correct properties', () => {
             return request(app)
               .get('/api/articles/1/comments')
@@ -226,6 +248,40 @@ describe('/api', () => {
                   descending: false
                 });
               });
+          });
+          describe('GET errors', () => {
+            it('GET: 404 - responds with 404 if attempting to get comments of article that does not exist', () => {
+              return request(app)
+                .get('/api/articles/99999/comments')
+                .expect(404)
+                .then(res => {
+                  expect(res.body.msg).to.eql('404 not found');
+                });
+            });
+            it('GET: 400 - responds with 400 if attempting to get comments with bad article_id data type', () => {
+              return request(app)
+                .get('/api/articles/not-valid-id/comments')
+                .expect(400)
+                .then(res => {
+                  expect(res.body.msg).to.eql('400 bad request');
+                });
+            });
+            it('GET: 400 - responds with 400 if sort_by query is invalid', () => {
+              return request(app)
+                .get('/api/articles/1/comments?sort_by=not-a-column')
+                .expect(400)
+                .then(res => {
+                  expect(res.body.msg).to.eql('400 bad request');
+                });
+            });
+            it('GET: 400 - responds with 400 if order query is invalid', () => {
+              return request(app)
+                .get('/api/articles/1/comments?order=not-valid-order')
+                .expect(400)
+                .then(res => {
+                  expect(res.body.msg).to.eql('400 bad request');
+                });
+            });
           });
         });
       });

@@ -2,17 +2,15 @@ const connection = require('../db/connection');
 
 const selectArticleByID = article_id => {
   return connection('articles')
-    .where({ article_id })
-    .select('*')
-    .then(result => {
-      if (result.length > 0) {
-        return connection('comments')
-          .where({ article_id })
-          .count('*')
-          .then(count => {
-            result[0]['comment_count'] = +count[0].count;
-            return result[0];
-          });
+    .where({ 'articles.article_id': article_id })
+    .select('articles.*')
+    .count({ comment_count: 'comment_id' })
+    .leftJoin('comments', 'articles.article_id', 'comments.article_id')
+    .groupBy('articles.article_id')
+    .then(articles => {
+      if (articles.length > 0) {
+        articles[0].comment_count = +articles[0].comment_count;
+        return articles[0];
       } else {
         return Promise.reject({ status: 404, msg: '404 not found' });
       }
@@ -50,16 +48,43 @@ const insertComment = (article_id, comment) => {
     });
 };
 
-const selectComments = (article_id, queryObj) => {
+const selectAllComments = (article_id, queryObj) => {
   return connection('comments')
     .where({ article_id })
     .select('*')
     .orderBy(queryObj.sort_by || 'created_at', queryObj.order || 'desc')
     .then(comments => {
-      comments.forEach(comment => {
-        delete comment.article_id;
+      if (
+        queryObj.order !== undefined &&
+        !['asc', 'desc'].includes(queryObj.order)
+      ) {
+        return Promise.reject({ status: 400, msg: '400 bad request' });
+      } else if (comments.length > 0) {
+        comments.forEach(comment => {
+          delete comment.article_id;
+        });
+        return comments;
+      } else {
+        return Promise.reject({ status: 404, msg: '404 not found' });
+      }
+    })
+    .catch(err => {
+      return Promise.reject(err);
+    });
+};
+
+const selectAllArticles = () => {
+  return connection('articles')
+    .select('articles.*')
+    .count({ comment_count: 'comment_id' })
+    .leftJoin('comments', 'articles.article_id', 'comments.article_id')
+    .groupBy('articles.article_id')
+    .then(articles => {
+      articles.forEach(article => {
+        delete article.body;
+        article.comment_count = +article.comment_count;
       });
-      return comments;
+      return articles;
     });
 };
 
@@ -67,5 +92,6 @@ module.exports = {
   selectArticleByID,
   updateArticleVotes,
   insertComment,
-  selectComments
+  selectAllComments,
+  selectAllArticles
 };

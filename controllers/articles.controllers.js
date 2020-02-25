@@ -2,7 +2,8 @@ const {
   selectArticleByID,
   updateArticleVotes,
   insertComment,
-  selectComments
+  selectAllComments,
+  selectAllArticles
 } = require('../models/articles.models');
 
 const getArticleByID = (req, res, next) => {
@@ -35,10 +36,20 @@ const postComment = (req, res, next) => {
     });
 };
 
-const getComments = (req, res, next) => {
-  selectComments(req.params.article_id, req.query)
+const getAllComments = (req, res, next) => {
+  selectAllComments(req.params.article_id, req.query)
     .then(comments => {
       res.status(200).send({ comments });
+    })
+    .catch(err => {
+      next(err);
+    });
+};
+
+const getAllArticles = (req, res, next) => {
+  selectAllArticles()
+    .then(articles => {
+      res.status(200).send({ articles });
     })
     .catch(err => {
       next(err);
@@ -49,5 +60,6 @@ module.exports = {
   getArticleByID,
   patchArticleVotes,
   postComment,
-  getComments
+  getAllComments,
+  getAllArticles
 };
