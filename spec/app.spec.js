@@ -24,7 +24,7 @@ describe('/api', () => {
   });
   describe('/users', () => {
     describe('/:username', () => {
-      describe.only('GET', () => {
+      describe('GET', () => {
         it('GET: 200 - responds with a user object based on given username containing username, avatar_url, and name properties', () => {
           return request(app)
             .get('/api/users/butter_bridge')
@@ -48,6 +48,33 @@ describe('/api', () => {
                 expect(res.body.msg).to.eql('404 not found');
               });
           });
+        });
+      });
+    });
+  });
+  describe.only('/articles', () => {
+    describe('/:article_id', () => {
+      describe('GET', () => {
+        it('GET: 200 - responds with an article object according to given article_id, with correct properties', () => {
+          return request(app)
+            .get('/api/articles/1')
+            .expect(200)
+            .then(res => {
+              expect(res.body.article).to.be.an('object');
+              expect(res.body.article).to.have.keys([
+                'author',
+                'title',
+                'article_id',
+                'body',
+                'topic',
+                'created_at',
+                'votes',
+                'comment_count'
+              ]);
+              expect(res.body.article.article_id).to.eql(1);
+              expect(res.body.article.author).to.eql('butter_bridge');
+              expect(res.body.article.comment_count).to.eql(13);
+            });
         });
       });
     });
