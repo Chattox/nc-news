@@ -33,4 +33,18 @@ const updateArticleVotes = (article_id, votes) => {
     });
 };
 
-module.exports = { selectArticleByID, updateArticleVotes };
+const insertComment = (article_id, comment) => {
+  const formattedComment = {
+    author: comment.username,
+    body: comment.body,
+    article_id: article_id
+  };
+  return connection('comments')
+    .insert(formattedComment)
+    .returning('*')
+    .then(comment => {
+      return comment[0];
+    });
+};
+
+module.exports = { selectArticleByID, updateArticleVotes, insertComment };

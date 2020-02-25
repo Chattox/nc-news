@@ -135,6 +135,29 @@ describe('/api', () => {
           });
         });
       });
+      describe('/comments', () => {
+        describe('POST', () => {
+          it('POST: 201 - posts new comment to given article and responds with 201 and new comment', () => {
+            return request(app)
+              .post('/api/articles/1/comments')
+              .send({ username: 'butter_bridge', body: 'Very good!' })
+              .expect(201)
+              .then(res => {
+                expect(res.body.comment).to.have.keys([
+                  'comment_id',
+                  'author',
+                  'article_id',
+                  'votes',
+                  'created_at',
+                  'body'
+                ]);
+                expect(res.body.comment.author).to.eql('butter_bridge');
+                expect(res.body.comment.body).to.eql('Very good!');
+                expect(res.body.comment.article_id).to.eql(1);
+              });
+          });
+        });
+      });
     });
   });
 });
