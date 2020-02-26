@@ -447,11 +447,29 @@ describe('/api', () => {
           });
         });
       });
-      describe.only('DELETE', () => {
+      describe('DELETE', () => {
         it('DELETE: 204 - responds with 204 and no content upon successful deletion', () => {
           return request(app)
             .delete('/api/comments/1')
             .expect(204);
+        });
+        describe('DELETE errors', () => {
+          it('DELETE: 404 - responds with 404 when attempting to delete comment which does not exist', () => {
+            return request(app)
+              .delete('/api/comments/99999')
+              .expect(404)
+              .then(res => {
+                expect(res.body.msg).to.eql('404 not found');
+              });
+          });
+          it('DELETE: 400 - responds with 400 when given incorrect data type for comment_id path', () => {
+            return request(app)
+              .delete('/api/comments/not-valid-id')
+              .expect(400)
+              .then(res => {
+                expect(res.body.msg).to.eql('400 bad request');
+              });
+          });
         });
       });
     });

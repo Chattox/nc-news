@@ -17,4 +17,16 @@ const updateCommentVotes = (comment_id, votes) => {
     });
 };
 
-module.exports = { updateCommentVotes };
+const deleteComment = comment_id => {
+  return connection('comments')
+    .where({ comment_id })
+    .del()
+    .returning('*')
+    .then(comment => {
+      if (comment.length === 0) {
+        return Promise.reject({ status: 404, msg: '404 not found' });
+      }
+    });
+};
+
+module.exports = { updateCommentVotes, deleteComment };

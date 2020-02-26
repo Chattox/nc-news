@@ -1,4 +1,7 @@
-const { updateCommentVotes } = require('../models/comments.models');
+const {
+  updateCommentVotes,
+  deleteComment
+} = require('../models/comments.models');
 
 const patchCommentVotes = (req, res, next) => {
   updateCommentVotes(req.params.comment_id, req.body)
@@ -10,4 +13,14 @@ const patchCommentVotes = (req, res, next) => {
     });
 };
 
-module.exports = { patchCommentVotes };
+const removeComment = (req, res, next) => {
+  deleteComment(req.params.comment_id)
+    .then(comment => {
+      res.status(204).send();
+    })
+    .catch(err => {
+      next(err);
+    });
+};
+
+module.exports = { patchCommentVotes, removeComment };
