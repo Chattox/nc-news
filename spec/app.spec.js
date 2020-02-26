@@ -19,6 +19,19 @@ describe('/api', () => {
         });
     });
   });
+  describe('INVALID METHODS', () => {
+    it('405 - responds with 405 when attempting to use a disallowed method', () => {
+      const invalidMethods = ['patch', 'put', 'delete'];
+      const methodPromises = invalidMethods.map(method => {
+        return request(app)
+          [method]('/api')
+          .expect(405)
+          .then(res => {
+            expect(res.body.msg).to.eql('405 method not allowed');
+          });
+      });
+    });
+  });
   describe('/topics', () => {
     describe('GET', () => {
       it('GET: 200 - responds with an array of topic objects, each with slub and description properties', () => {

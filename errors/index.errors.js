@@ -26,4 +26,13 @@ const handle500Errors = (err, req, res, next) => {
   res.status(500).send({ msg: '500 internal server error' });
 };
 
-module.exports = { handleCustomErrors, handlePSQLErrors, handle500Errors };
+const handle405Errors = (req, res, next) => {
+  res.status(405).send({ msg: '405 method not allowed' });
+};
+
+module.exports = {
+  handleCustomErrors,
+  handlePSQLErrors,
+  handle500Errors,
+  handle405Errors
+};
