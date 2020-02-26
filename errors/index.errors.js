@@ -14,6 +14,8 @@ const handlePSQLErrors = (err, req, res, next) => {
       res.status(404).send({ msg: '404 not found' });
     } else if (err.code === '42703') {
       res.status(400).send({ msg: '400 bad request' });
+    } else if (err.code === '23502') {
+      res.status(400).send({ msg: '400 bad request' });
     }
   } else {
     next(err);

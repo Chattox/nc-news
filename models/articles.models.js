@@ -68,7 +68,13 @@ const selectAllComments = (article_id, queryObj) => {
         });
         return comments;
       } else {
-        return Promise.reject({ status: 404, msg: '404 not found' });
+        return checkIfExists('articles', article_id).then(res => {
+          if (res) {
+            return comments;
+          } else {
+            return Promise.reject({ status: 404, msg: '404 not found' });
+          }
+        });
       }
     })
     .catch(err => {
@@ -142,6 +148,8 @@ const checkIfExists = (queryTable, queryTerm) => {
         query.where({ username: queryTerm });
       } else if (queryTable === 'topics') {
         query.where({ slug: queryTerm });
+      } else if (queryTable === 'articles') {
+        query.where({ article_id: queryTerm });
       }
     })
     .then(result => {

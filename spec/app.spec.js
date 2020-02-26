@@ -9,7 +9,7 @@ const connection = require('../db/connection');
 describe('/api', () => {
   beforeEach(() => connection.seed.run());
   after(() => connection.destroy());
-  describe.only('GET', () => {
+  describe('GET', () => {
     it('GET: 200 - responds with 200 and a JSON object describing all available endpoints', () => {
       return request(app)
         .get('/api')
@@ -65,7 +65,7 @@ describe('/api', () => {
     });
   });
   describe('/articles', () => {
-    describe.only('GET', () => {
+    describe('GET', () => {
       it('GET: 200 - responds with an array of article objects with the correct properties', () => {
         return request(app)
           .get('/api/articles')
@@ -332,6 +332,15 @@ describe('/api', () => {
                   expect(res.body.msg).to.eql('400 bad request');
                 });
             });
+            it('POST: 400 - responds with 400 when post body does not contain all required keys', () => {
+              return request(app)
+                .post('/api/articles/1/comments')
+                .send({ body: 'Very good!' })
+                .expect(400)
+                .then(res => {
+                  expect(res.body.msg).to.eql('400 bad request');
+                });
+            });
           });
         });
         describe('GET', () => {
@@ -380,6 +389,14 @@ describe('/api', () => {
                 expect(res.body.comments).to.be.sortedBy('author', {
                   descending: false
                 });
+              });
+          });
+          it('GET: 200 - responds with 200 and empty array when article exists but has no comments', () => {
+            return request(app)
+              .get('/api/articles/2/comments')
+              .expect(200)
+              .then(res => {
+                expect(res.body.comments.length).to.eql(0);
               });
           });
           describe('GET errors', () => {
