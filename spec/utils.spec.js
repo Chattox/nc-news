@@ -66,6 +66,34 @@ describe('formatDates', () => {
     });
     expect(actual).to.not.equal(input);
   });
+  it('does not mutate original data', () => {
+    const input = [
+      {
+        title: 'title',
+        topic: 'topic',
+        author: 'author',
+        body: 'body',
+        created_at: 1492163783248
+      },
+      {
+        title: 'title',
+        topic: 'topic',
+        author: 'author',
+        body: 'body',
+        created_at: 1542284514171
+      },
+      {
+        title: 'title',
+        topic: 'topic',
+        author: 'author',
+        body: 'body',
+        created_at: 1416140514171
+      }
+    ];
+    const inputCopy = [...input];
+    const actual = formatDates(input);
+    expect(input).to.eql(inputCopy);
+  });
 });
 
 describe('makeRefObj', () => {
@@ -125,9 +153,44 @@ describe('makeRefObj', () => {
 
     expect(actual).to.eql(expected);
   });
+  it('does not mutate original data', () => {
+    const input = [
+      {
+        article_id: 1,
+        title: 'hello',
+        body: 'body',
+        votes: 0,
+        topic: 'topic',
+        author: 'author',
+        created_at: 0
+      },
+      {
+        article_id: 2,
+        title: 'world',
+        body: 'body',
+        votes: 0,
+        topic: 'topic',
+        author: 'author',
+        created_at: 0
+      },
+      {
+        article_id: 3,
+        title: 'test',
+        body: 'body',
+        votes: 0,
+        topic: 'topic',
+        author: 'author',
+        created_at: 0
+      }
+    ];
+    const actual = makeRefObj(input);
+    const inputCopy = [...input];
+
+    expect(input).to.eql(inputCopy);
+  });
 });
 
-describe.only('formatComments', () => {
+describe('formatComments', () => {
   it('takes an array and ref obj, returns a new array', () => {
     const input = [];
     const refObj = {};
@@ -206,5 +269,35 @@ describe.only('formatComments', () => {
       expect(comment.created_at).to.eql(date);
     });
     expect(actual).to.not.equal(input);
+  });
+  it('does not mutate original data', () => {
+    const input = [
+      {
+        body: 'body',
+        belongs_to: 'title',
+        created_by: 'username',
+        votes: 0,
+        created_at: 1468087638932
+      },
+      {
+        body: 'test body',
+        belongs_to: 'hello world',
+        created_by: 'username2',
+        votes: 5,
+        created_at: 1478813209256
+      },
+      {
+        body: 'second test body',
+        belongs_to: 'a different title',
+        created_by: 'test_username',
+        votes: 11,
+        created_at: 1504183900263
+      }
+    ];
+    const refObj = { title: 1, 'hello world': 2, 'a different title': 3 };
+    const actual = formatComments(input, refObj);
+    const inputClone = [...input];
+
+    expect(input).to.eql(inputClone);
   });
 });
