@@ -1,6 +1,6 @@
 const connection = require('../db/connection');
 
-const selectArticleByID = (article_id, queryOBj) => {
+const selectArticleByID = article_id => {
   return connection('articles')
     .where({ 'articles.article_id': article_id })
     .select('articles.*')
@@ -27,7 +27,6 @@ const updateArticleVotes = (article_id, votes) => {
     .returning('*')
     .then(article => {
       if (article.length > 0) {
-        console.log(article[0]);
         return article[0];
       } else {
         return Promise.reject({ status: 404, msg: '404 not found' });
@@ -77,18 +76,36 @@ const selectAllComments = (article_id, queryObj) => {
     });
 };
 
-const selectAllArticles = () => {
+const selectAllArticles = queryObj => {
+  if (
+    queryObj.order !== undefined &&
+    !['asc', 'desc'].includes(queryObj.order)
+  ) {
+    return Promise.reject({ status: 400, msg: '400 bad request' });
+  }
   return connection('articles')
     .select('articles.*')
     .count({ comment_count: 'comment_id' })
     .leftJoin('comments', 'articles.article_id', 'comments.article_id')
     .groupBy('articles.article_id')
+    .orderBy(queryObj.sort_by || 'created_at', queryObj.order || 'desc')
+    .modify(query => {
+      if (queryObj.author) {
+        query.where({ 'articles.author': queryObj.author });
+      } else if (queryObj.topic) {
+        query.where({ topic: queryObj.topic });
+      }
+    })
     .then(articles => {
-      articles.forEach(article => {
-        delete article.body;
-        article.comment_count = +article.comment_count;
-      });
-      return articles;
+      if (articles.length > 0) {
+        articles.forEach(article => {
+          delete article.body;
+          article.comment_count = +article.comment_count;
+        });
+        return articles;
+      } else {
+        return Promise.reject({ status: 404, msg: '404 not found' });
+      }
     });
 };
 

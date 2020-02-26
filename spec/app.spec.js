@@ -55,7 +55,7 @@ describe('/api', () => {
     });
   });
   describe('/articles', () => {
-    describe('GET', () => {
+    describe.only('GET', () => {
       it('GET: 200 - responds with an array of article objects with the correct properties', () => {
         return request(app)
           .get('/api/articles')
@@ -85,6 +85,60 @@ describe('/api', () => {
               descending: true
             });
           });
+      });
+      it('GET: 200 - accepts author query and filters results by given username value', () => {
+        return request(app)
+          .get('/api/articles?author=butter_bridge')
+          .expect(200)
+          .then(res => {
+            res.body.articles.forEach(article => {
+              expect(article.author).to.eql('butter_bridge');
+            });
+          });
+      });
+      it('GET: 200 - accepts topic query and filters results by given topic', () => {
+        return request(app)
+          .get('/api/articles?topic=mitch')
+          .expect(200)
+          .then(res => {
+            res.body.articles.forEach(article => {
+              expect(article.topic).to.eql('mitch');
+            });
+          });
+      });
+      describe('GET errors', () => {
+        it('GET: 400 - responds with 400 when attempting to sort by a column that does not exist', () => {
+          return request(app)
+            .get('/api/articles?sort_by=not-a-column')
+            .expect(400)
+            .then(res => {
+              expect(res.body.msg).to.eql('400 bad request');
+            });
+        });
+        it('GET: 400 - responds with 400 when given an order query that is not asc or desc', () => {
+          return request(app)
+            .get('/api/articles?order=not-an-order')
+            .expect(400)
+            .then(res => {
+              expect(res.body.msg).to.eql('400 bad request');
+            });
+        });
+        it('GET: 404 - responds with 404 when given author or topic query not in the database', () => {
+          return request(app)
+            .get('/api/articles?author=chattox')
+            .expect(404)
+            .then(res => {
+              expect(res.body.msg).to.eql('404 not found');
+            });
+        });
+        it('GET: 404 - responds with 404 when querying author/topic with no articles associated with them', () => {
+          return request(app)
+            .get('/api/articles?topic=paper')
+            .expect(404)
+            .then(res => {
+              expect(res.body.msg).to.eql('404 not found');
+            });
+        });
       });
     });
     describe('/:article_id', () => {
@@ -129,7 +183,7 @@ describe('/api', () => {
           });
         });
       });
-      describe.only('PATCH', () => {
+      describe('PATCH', () => {
         it('PATCH: 200 - responds with 200 and updated article when given vote increment object in the form of {inc_votes: newVote}', () => {
           return request(app)
             .patch('/api/articles/1')
@@ -167,7 +221,7 @@ describe('/api', () => {
                 expect(res.body.msg).to.eql('400 bad request');
               });
           });
-          it.only('PATCH: 400 - responds with 400 when req body does not contain inc_votes', () => {
+          it('PATCH: 400 - responds with 400 when req body does not contain inc_votes', () => {
             return request(app)
               .patch('/api/articles/1')
               .send({})
@@ -185,7 +239,7 @@ describe('/api', () => {
                 expect(res.body.msg).to.eql('400 bad request');
               });
           });
-          it.only('PATCH: 400 - responds with 400 if req body has properties other than inc_votes', () => {
+          it('PATCH: 400 - responds with 400 if req body has properties other than inc_votes', () => {
             return request(app)
               .patch('/api/articles/1')
               .send({ inc_votes: 5, name: 'chattox' })
