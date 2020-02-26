@@ -458,6 +458,15 @@ describe('/api', () => {
               expect(res.body.comment.votes).to.eql(11);
             });
         });
+        it('PATCH: 200 - responds with 200 and unchanged comment when no information is passed in req body', () => {
+          return request(app)
+            .patch('/api/comments/1')
+            .send()
+            .expect(200)
+            .then(res => {
+              expect(res.body.comment.votes).to.eql(16);
+            });
+        });
         describe('PATCH errors', () => {
           it('PATCH: 404 - responds with 404 when attempting to patch a comment that does not exist', () => {
             return request(app)
@@ -472,15 +481,6 @@ describe('/api', () => {
             return request(app)
               .patch('/api/comments/not-valid-id')
               .send({ inc_votes: -5 })
-              .expect(400)
-              .then(res => {
-                expect(res.body.msg).to.eql('400 bad request');
-              });
-          });
-          it('PATCH: 400 - responds with 400 when req body does not contain inc_votes', () => {
-            return request(app)
-              .patch('/api/comments/1')
-              .send({})
               .expect(400)
               .then(res => {
                 expect(res.body.msg).to.eql('400 bad request');
