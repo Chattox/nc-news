@@ -55,7 +55,7 @@ describe('/api', () => {
     });
   });
   describe('/articles', () => {
-    describe.only('GET', () => {
+    describe('GET', () => {
       it('GET: 200 - responds with an array of article objects with the correct properties', () => {
         return request(app)
           .get('/api/articles')
@@ -374,6 +374,84 @@ describe('/api', () => {
                 });
             });
           });
+        });
+      });
+    });
+  });
+  describe('/comments', () => {
+    describe('/:comments_id', () => {
+      describe('PATCH', () => {
+        it('PATCH: 200 - responds with 200 and updated comment when given vote increment object in the form of {inc_votes: newVote}', () => {
+          return request(app)
+            .patch('/api/comments/1')
+            .send({ inc_votes: 5 })
+            .expect(200)
+            .then(res => {
+              expect(res.body.comment.votes).to.eql(21);
+            });
+        });
+        it('PATCH: 200 - also correctly decrements vote property when inc_votes is negative', () => {
+          return request(app)
+            .patch('/api/comments/1')
+            .send({ inc_votes: -5 })
+            .expect(200)
+            .then(res => {
+              expect(res.body.comment.votes).to.eql(11);
+            });
+        });
+        describe('PATCH errors', () => {
+          it('PATCH: 404 - responds with 404 when attempting to patch a comment that does not exist', () => {
+            return request(app)
+              .patch('/api/comments/99999')
+              .send({ inc_votes: -5 })
+              .expect(404)
+              .then(res => {
+                expect(res.body.msg).to.eql('404 not found');
+              });
+          });
+          it('PATCH: 400 - responds with 400 when given comment_id of wrong data type', () => {
+            return request(app)
+              .patch('/api/comments/not-valid-id')
+              .send({ inc_votes: -5 })
+              .expect(400)
+              .then(res => {
+                expect(res.body.msg).to.eql('400 bad request');
+              });
+          });
+          it('PATCH: 400 - responds with 400 when req body does not contain inc_votes', () => {
+            return request(app)
+              .patch('/api/comments/1')
+              .send({})
+              .expect(400)
+              .then(res => {
+                expect(res.body.msg).to.eql('400 bad request');
+              });
+          });
+          it('PATCH: 400 - responds with 400 if inc_votes is invalid data type', () => {
+            return request(app)
+              .patch('/api/comments/1')
+              .send({ inc_votes: 'not a vote' })
+              .expect(400)
+              .then(res => {
+                expect(res.body.msg).to.eql('400 bad request');
+              });
+          });
+          it('PATCH: 400 - responds with 400 if req body has properties other than inc_votes', () => {
+            return request(app)
+              .patch('/api/comments/1')
+              .send({ inc_votes: 5, name: 'chattox' })
+              .expect(400)
+              .then(res => {
+                expect(res.body.msg).to.eql('400 bad request');
+              });
+          });
+        });
+      });
+      describe.only('DELETE', () => {
+        it('DELETE: 204 - responds with 204 and no content upon successful deletion', () => {
+          return request(app)
+            .delete('/api/comments/1')
+            .expect(204);
         });
       });
     });
