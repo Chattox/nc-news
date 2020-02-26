@@ -9,6 +9,16 @@ const connection = require('../db/connection');
 describe('/api', () => {
   beforeEach(() => connection.seed.run());
   after(() => connection.destroy());
+  describe.only('GET', () => {
+    it('GET: 200 - responds with 200 and a JSON object describing all available endpoints', () => {
+      return request(app)
+        .get('/api')
+        .expect(200)
+        .then(res => {
+          expect(res.body.endpoints).to.be.a('string');
+        });
+    });
+  });
   describe('/topics', () => {
     describe('GET', () => {
       it('GET: 200 - responds with an array of topic objects, each with slub and description properties', () => {
@@ -55,7 +65,7 @@ describe('/api', () => {
     });
   });
   describe('/articles', () => {
-    describe.only('GET', () => {
+    describe('GET', () => {
       it('GET: 200 - responds with an array of article objects with the correct properties', () => {
         return request(app)
           .get('/api/articles')
