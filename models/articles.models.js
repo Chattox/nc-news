@@ -111,7 +111,44 @@ const selectAllArticles = queryObj => {
         });
         return articles;
       } else {
-        return Promise.reject({ status: 404, msg: '404 not found' });
+        if (queryObj.author) {
+          return checkIfExists('users', queryObj.author).then(res => {
+            if (res) {
+              return articles;
+            } else {
+              return Promise.reject({ status: 404, msg: '404 not found' });
+            }
+          });
+        } else if (queryObj.topic) {
+          return checkIfExists('topics', queryObj.topic).then(res => {
+            if (res) {
+              return articles;
+            } else {
+              return Promise.reject({ status: 404, msg: '404 not found' });
+            }
+          });
+        } else {
+          return Promise.reject({ status: 404, msg: '404 not found' });
+        }
+      }
+    });
+};
+
+const checkIfExists = (queryTable, queryTerm) => {
+  return connection(queryTable)
+    .select('*')
+    .modify(query => {
+      if (queryTable === 'users') {
+        query.where({ username: queryTerm });
+      } else if (queryTable === 'topics') {
+        query.where({ slug: queryTerm });
+      }
+    })
+    .then(result => {
+      if (result.length > 0) {
+        return true;
+      } else {
+        return false;
       }
     });
 };

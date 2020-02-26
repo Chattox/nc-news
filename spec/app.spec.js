@@ -65,7 +65,7 @@ describe('/api', () => {
     });
   });
   describe('/articles', () => {
-    describe('GET', () => {
+    describe.only('GET', () => {
       it('GET: 200 - responds with an array of article objects with the correct properties', () => {
         return request(app)
           .get('/api/articles')
@@ -116,6 +116,22 @@ describe('/api', () => {
             });
           });
       });
+      it('GET: 200 - responds with empty array when querying user that exists but has no articles associated with them', () => {
+        return request(app)
+          .get('/api/articles?author=lurker')
+          .expect(200)
+          .then(res => {
+            expect(res.body.articles.length).to.eql(0);
+          });
+      });
+      it('GET: 200 - responds with empty array when querying topic that exists but has no articles associated with it', () => {
+        return request(app)
+          .get('/api/articles?topic=paper')
+          .expect(200)
+          .then(res => {
+            expect(res.body.articles.length).to.eql(0);
+          });
+      });
       describe('GET errors', () => {
         it('GET: 400 - responds with 400 when attempting to sort by a column that does not exist', () => {
           return request(app)
@@ -133,7 +149,7 @@ describe('/api', () => {
               expect(res.body.msg).to.eql('400 bad request');
             });
         });
-        it('GET: 404 - responds with 404 when given author or topic query not in the database', () => {
+        it('GET: 404 - responds with 404 when given author query not in the database', () => {
           return request(app)
             .get('/api/articles?author=chattox')
             .expect(404)
@@ -141,9 +157,9 @@ describe('/api', () => {
               expect(res.body.msg).to.eql('404 not found');
             });
         });
-        it('GET: 404 - responds with 404 when querying author/topic with no articles associated with them', () => {
+        it('GET: 404 - responds with 404 when given topic query not in the database', () => {
           return request(app)
-            .get('/api/articles?topic=paper')
+            .get('/api/articles?topic=not-a-topic')
             .expect(404)
             .then(res => {
               expect(res.body.msg).to.eql('404 not found');
