@@ -55,7 +55,7 @@ describe('/api', () => {
     });
   });
   describe('/articles', () => {
-    describe.only('GET', () => {
+    describe('GET', () => {
       it('GET: 200 - responds with an array of article objects with the correct properties', () => {
         return request(app)
           .get('/api/articles')
@@ -73,6 +73,16 @@ describe('/api', () => {
                 'comment_count'
               ]);
               expect(article.comment_count).to.be.a('number');
+            });
+          });
+      });
+      it('GET: 200 - accepts sort_by query (default date), sorts by any valid column', () => {
+        return request(app)
+          .get('/api/articles?sort_by=comment_count')
+          .expect(200)
+          .then(res => {
+            expect(res.body.articles).to.be.sortedBy('comment_count', {
+              descending: true
             });
           });
       });
@@ -119,7 +129,7 @@ describe('/api', () => {
           });
         });
       });
-      describe('PATCH', () => {
+      describe.only('PATCH', () => {
         it('PATCH: 200 - responds with 200 and updated article when given vote increment object in the form of {inc_votes: newVote}', () => {
           return request(app)
             .patch('/api/articles/1')
@@ -152,6 +162,33 @@ describe('/api', () => {
             return request(app)
               .patch('/api/articles/not-valid-id')
               .send({ inc_votes: -5 })
+              .expect(400)
+              .then(res => {
+                expect(res.body.msg).to.eql('400 bad request');
+              });
+          });
+          it.only('PATCH: 400 - responds with 400 when req body does not contain inc_votes', () => {
+            return request(app)
+              .patch('/api/articles/1')
+              .send({})
+              .expect(400)
+              .then(res => {
+                expect(res.body.msg).to.eql('400 bad request');
+              });
+          });
+          it('PATCH: 400 - responds with 400 if inc_votes is invalid data type', () => {
+            return request(app)
+              .patch('/api/articles/1')
+              .send({ inc_votes: 'not a vote' })
+              .expect(400)
+              .then(res => {
+                expect(res.body.msg).to.eql('400 bad request');
+              });
+          });
+          it.only('PATCH: 400 - responds with 400 if req body has properties other than inc_votes', () => {
+            return request(app)
+              .patch('/api/articles/1')
+              .send({ inc_votes: 5, name: 'chattox' })
               .expect(400)
               .then(res => {
                 expect(res.body.msg).to.eql('400 bad request');
