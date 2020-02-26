@@ -77,6 +77,13 @@ const selectAllComments = (article_id, queryObj) => {
 };
 
 const selectAllArticles = queryObj => {
+  for (prop in queryObj) {
+    if (prop === 'teapot' && queryObj[prop] === 'coffee') {
+      return Promise.reject({ status: 418, msg: "418 I'm a teapot" });
+    } else if (!['sort_by', 'order', 'author', 'topic'].includes(prop)) {
+      return Promise.reject({ status: 400, msg: '400 bad request' });
+    }
+  }
   if (
     queryObj.order !== undefined &&
     !['asc', 'desc'].includes(queryObj.order)

@@ -4,7 +4,11 @@ const selectAllTopics = () => {
   return connection('topics')
     .select('*')
     .then(result => {
-      return result;
+      if (result.length > 0) {
+        return result;
+      } else {
+        return Promise.reject({ status: 404, msg: '404 not found' });
+      }
     });
 };
 

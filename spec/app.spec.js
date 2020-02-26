@@ -55,7 +55,7 @@ describe('/api', () => {
     });
   });
   describe('/articles', () => {
-    describe('GET', () => {
+    describe.only('GET', () => {
       it('GET: 200 - responds with an array of article objects with the correct properties', () => {
         return request(app)
           .get('/api/articles')
@@ -137,6 +137,22 @@ describe('/api', () => {
             .expect(404)
             .then(res => {
               expect(res.body.msg).to.eql('404 not found');
+            });
+        });
+        it('GET: 400 - responds with 400 if passed unrecognised query', () => {
+          return request(app)
+            .get('/api/articles?colour=green')
+            .expect(400)
+            .then(res => {
+              expect(res.body.msg).to.eql('400 bad request');
+            });
+        });
+        it('GET: 418 - responds with 418 if teapot is queried for coffee', () => {
+          return request(app)
+            .get('/api/articles?teapot=coffee')
+            .expect(418)
+            .then(res => {
+              expect(res.body.msg).to.eql("418 I'm a teapot");
             });
         });
       });
