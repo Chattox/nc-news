@@ -18,20 +18,24 @@ const selectArticleByID = article_id => {
 };
 
 const updateArticleVotes = (article_id, votes) => {
-  if (!votes.hasOwnProperty('inc_votes') || Object.keys(votes).length > 1) {
+  if (
+    (votes.hasOwnProperty('inc_votes') && Object.keys(votes).length === 1) ||
+    Object.keys(votes).length === 0
+  ) {
+    return connection('articles')
+      .where({ article_id })
+      .increment('votes', votes.inc_votes || 0)
+      .returning('*')
+      .then(article => {
+        if (article.length > 0) {
+          return article[0];
+        } else {
+          return Promise.reject({ status: 404, msg: '404 not found' });
+        }
+      });
+  } else {
     return Promise.reject({ status: 400, msg: '400 bad request' });
   }
-  return connection('articles')
-    .where({ article_id })
-    .increment('votes', votes.inc_votes)
-    .returning('*')
-    .then(article => {
-      if (article.length > 0) {
-        return article[0];
-      } else {
-        return Promise.reject({ status: 404, msg: '404 not found' });
-      }
-    });
 };
 
 const insertComment = (article_id, comment) => {
