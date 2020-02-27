@@ -67,7 +67,7 @@
     }
   },
   "POST /api/articles/:article_id/comments": {
-    "description": "creates a comment associated with article of given ID from request body and responds with newly created comment",
+    "description": "creates a comment associated with article of given ID with content and author username given in request body, responds with the newly created comment",
     "body": { "username": "username", "body": "comment body" },
     "exampleResponse": {
       "comment": {
