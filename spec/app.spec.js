@@ -15,7 +15,8 @@ describe('/api', () => {
         .get('/api')
         .expect(200)
         .then(res => {
-          expect(res.body.endpoints).to.be.a('string');
+          expect(res.body.endpoints).to.be.an('object');
+          expect(res.body.endpoints).to.contain.keys(['GET /api']);
         });
     });
   });
