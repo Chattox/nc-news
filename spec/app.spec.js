@@ -47,6 +47,37 @@ describe('/api', () => {
           });
       });
     });
+    describe.only('POST', () => {
+      it('POST: 201 - posts new topic and responds with 201 and new topic', () => {
+        return request(app)
+          .post('/api/topics')
+          .send({
+            slug: 'dune',
+            description: 'It is by will alone I set my mind in motion'
+          })
+          .expect(201)
+          .then(res => {
+            expect(res.body.topic).to.have.keys(['slug', 'description']);
+            expect(res.body.topic.slug).to.eql('dune');
+            expect(res.body.topic.description).to.eql(
+              'It is by will alone I set my mind in motion'
+            );
+          });
+      });
+      describe('POST errors', () => {
+        it('POST: 400 - responds with 400 when post body does not contain all required keys', () => {
+          return request(app)
+            .post('/api/topics')
+            .send({
+              description: 'Fear is the mind killer'
+            })
+            .expect(400)
+            .then(res => {
+              expect(res.body.msg).to.eql('400 bad request');
+            });
+        });
+      });
+    });
   });
   describe('/users', () => {
     describe('/:username', () => {

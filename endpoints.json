@@ -139,5 +139,13 @@
     "description": "deletes article with given article ID",
     "queries": [],
     "exampleResponse": 204
+  },
+  "POST /api/topics": {
+    "description": "creates a new topic using content in request body and responds with newly created topic",
+    "body": { "slug": "topic name", "description": "topic description" },
+    "exampleResponse": {
+      "slug": "topic name",
+      "description": "topic description"
+    }
   }
 }

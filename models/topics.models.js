@@ -12,4 +12,13 @@ const selectAllTopics = () => {
     });
 };
 
-module.exports = { selectAllTopics };
+const insertTopic = topic => {
+  return connection('topics')
+    .insert(topic)
+    .returning('*')
+    .then(topic => {
+      return topic[0];
+    });
+};
+
+module.exports = { selectAllTopics, insertTopic };
