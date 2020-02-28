@@ -21,7 +21,8 @@
           "body": "Text from the article..",
           "created_at": 1527695953341
         }
-      ]
+      ],
+      "total_count": 1
     }
   },
   "GET /api/users/:username": {
