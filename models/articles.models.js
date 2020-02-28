@@ -189,10 +189,34 @@ const articlesTotalCount = (table, queryObj) => {
     });
 };
 
+const insertArticle = article => {
+  if (Object.keys(article).length !== 4) {
+    return Promise.reject({ status: 400, msg: '400 bad request' });
+  } else {
+    for (prop in article) {
+      console.log(prop);
+      if (!['title', 'body', 'topic', 'author'].includes(prop)) {
+        return Promise.reject({ status: 400, msg: '400 bad request' });
+      }
+    }
+  }
+
+  return connection('articles')
+    .insert(article)
+    .returning('*')
+    .then(article => {
+      return article[0];
+    })
+    .catch(err => {
+      return Promise.reject(err);
+    });
+};
+
 module.exports = {
   selectArticleByID,
   updateArticleVotes,
   insertComment,
   selectAllComments,
-  selectAllArticles
+  selectAllArticles,
+  insertArticle
 };

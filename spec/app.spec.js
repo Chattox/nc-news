@@ -224,6 +224,47 @@ describe('/api', () => {
         });
       });
     });
+    describe.only('POST', () => {
+      it('POST: 201 - posts new article and responds with 201 and new article', () => {
+        const article = {
+          title: 'this is a title',
+          body: 'this is a body',
+          topic: 'cats',
+          author: 'butter_bridge'
+        };
+        return request(app)
+          .post('/api/articles')
+          .send(article)
+          .expect(201)
+          .then(res => {
+            expect(res.body.article).to.have.keys([
+              'title',
+              'body',
+              'topic',
+              'author',
+              'created_at',
+              'article_id',
+              'votes'
+            ]);
+            expect(res.body.article.title).to.eql(article.title);
+            expect(res.body.article.body).to.eql(article.body);
+          });
+      });
+      describe('POST errors', () => {
+        it('POST: 400 - responds with 400 when post body does not contain all required keys', () => {
+          return request(app)
+            .post('/api/articles')
+            .send({
+              title: 'this is a title',
+              body: 'this is a body and there is nothing else'
+            })
+            .expect(400)
+            .then(res => {
+              expect(res.body.msg).to.eql('400 bad request');
+            });
+        });
+      });
+    });
     describe('/:article_id', () => {
       describe('GET', () => {
         it('GET: 200 - responds with an article object according to given article_id, with correct properties', () => {
