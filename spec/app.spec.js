@@ -374,6 +374,41 @@ describe('/api', () => {
           });
         });
       });
+      describe('DELETE', () => {
+        it('DELETE: 204 - responds with 204 and no content upon successful deletion', () => {
+          return request(app)
+            .delete('/api/articles/1')
+            .expect(204);
+        });
+        it('DELETE: 204 - also deletes all comments associated with article', () => {
+          return request(app)
+            .delete('/api/articles/1')
+            .expect(204)
+            .then(res => {
+              return request(app)
+                .get('/api/articles/1/comments')
+                .expect(404);
+            });
+        });
+        describe('DELETE errors', () => {
+          it('DELETE: 404 - responds with 404 when attempting to delete article which does not exist', () => {
+            return request(app)
+              .delete('/api/articles/99999')
+              .expect(404)
+              .then(res => {
+                expect(res.body.msg).to.eql('404 not found');
+              });
+          });
+          it('DELETE: 400 - responds with 400 when given incorrect data type for article_id path', () => {
+            return request(app)
+              .delete('/api/articles/not-valid-id')
+              .expect(400)
+              .then(res => {
+                expect(res.body.msg).to.eql('400 bad request');
+              });
+          });
+        });
+      });
       describe('/comments', () => {
         describe('POST', () => {
           it('POST: 201 - posts new comment to given article and responds with 201 and new comment', () => {

@@ -211,11 +211,24 @@ const insertArticle = article => {
     });
 };
 
+const deleteArticle = article_id => {
+  return connection('articles')
+    .where({ article_id })
+    .del()
+    .returning('*')
+    .then(article => {
+      if (article.length === 0) {
+        return Promise.reject({ status: 404, msg: '404 not found' });
+      }
+    });
+};
+
 module.exports = {
   selectArticleByID,
   updateArticleVotes,
   insertComment,
   selectAllComments,
   selectAllArticles,
-  insertArticle
+  insertArticle,
+  deleteArticle
 };
