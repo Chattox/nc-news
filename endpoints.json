@@ -10,8 +10,8 @@
     }
   },
   "GET /api/articles": {
-    "description": "serves an array of all articles",
-    "queries": ["author", "topic", "sort_by", "order"],
+    "description": "serves a paginated array of articles",
+    "queries": ["author", "topic", "sort_by", "order", "limit", "p"],
     "exampleResponse": {
       "articles": [
         {
@@ -82,8 +82,8 @@
     }
   },
   "GET /api/articles/:article_id/comments": {
-    "description": "responds with an array of comments associated with the article of given ID",
-    "queries": ["sort_by", "order"],
+    "description": "responds with a paginated array of comments associated with the article of given ID",
+    "queries": ["sort_by", "order", "limit", "p"],
     "exampleResponse": {
       "comments": [
         {
