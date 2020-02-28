@@ -146,6 +146,24 @@ describe('/api', () => {
             expect(res.body.articles.length).to.eql(0);
           });
       });
+      it('GET: 200 - accepts limit query (default 10) which limits the amount of articles responded with to given amount', () => {
+        return request(app)
+          .get('/api/articles?limit=5')
+          .expect(200)
+          .then(res => {
+            expect(res.body.articles.length).to.eql(5);
+          });
+      });
+      it('GET: 200 - accepts p query (default 1) which dictates which page of article results to respond with', () => {
+        return request(app)
+          .get('/api/articles?limit=5&p=2')
+          .expect(200)
+          .then(res => {
+            expect(res.body.articles.length).to.eql(5);
+            expect(res.body.articles[0].article_id).to.eql(6);
+            expect(res.body.articles[4].article_id).to.eql(10);
+          });
+      });
       describe('GET errors', () => {
         it('GET: 400 - responds with 400 when attempting to sort by a column that does not exist', () => {
           return request(app)

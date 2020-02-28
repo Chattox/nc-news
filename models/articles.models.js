@@ -90,7 +90,9 @@ const selectAllArticles = queryObj => {
   for (prop in queryObj) {
     if (prop === 'teapot' && queryObj[prop] === 'coffee') {
       return Promise.reject({ status: 418, msg: "418 I'm a teapot" });
-    } else if (!['sort_by', 'order', 'author', 'topic'].includes(prop)) {
+    } else if (
+      !['sort_by', 'order', 'limit', 'p', 'author', 'topic'].includes(prop)
+    ) {
       return Promise.reject({ status: 400, msg: '400 bad request' });
     }
   }
@@ -100,12 +102,15 @@ const selectAllArticles = queryObj => {
   ) {
     return Promise.reject({ status: 400, msg: '400 bad request' });
   }
+
   return connection('articles')
     .select('articles.*')
     .count({ comment_count: 'comment_id' })
     .leftJoin('comments', 'articles.article_id', 'comments.article_id')
     .groupBy('articles.article_id')
     .orderBy(queryObj.sort_by || 'created_at', queryObj.order || 'desc')
+    .limit(+queryObj.limit || 10)
+    .offset((+queryObj.p - 1) * +queryObj.limit || 0)
     .modify(query => {
       if (queryObj.author) {
         query.where({ 'articles.author': queryObj.author });
