@@ -194,7 +194,6 @@ const insertArticle = article => {
     return Promise.reject({ status: 400, msg: '400 bad request' });
   } else {
     for (prop in article) {
-      console.log(prop);
       if (!['title', 'body', 'topic', 'author'].includes(prop)) {
         return Promise.reject({ status: 400, msg: '400 bad request' });
       }

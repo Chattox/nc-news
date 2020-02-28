@@ -224,7 +224,7 @@ describe('/api', () => {
         });
       });
     });
-    describe.only('POST', () => {
+    describe('POST', () => {
       it('POST: 201 - posts new article and responds with 201 and new article', () => {
         const article = {
           title: 'this is a title',
