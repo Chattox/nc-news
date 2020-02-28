@@ -164,6 +164,15 @@ describe('/api', () => {
             expect(res.body.articles[4].article_id).to.eql(10);
           });
       });
+      it('GET: 200 - articles object has total_count property showing total number of articles with filters applied, discounting page limit', () => {
+        return request(app)
+          .get('/api/articles?topic=mitch&limit=5')
+          .expect(200)
+          .then(res => {
+            expect(res.body).to.have.keys(['articles', 'total_count']);
+            expect(res.body.total_count).to.eql(11);
+          });
+      });
       describe('GET errors', () => {
         it('GET: 400 - responds with 400 when attempting to sort by a column that does not exist', () => {
           return request(app)

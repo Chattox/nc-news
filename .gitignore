@@ -1,9 +1,3 @@
 node_modules
 knexfile.js
-be-nc-news-to-fix.md
-be-nc-news-checklist.md
-to-do.md
-old-README.md
-error-handling.md
-hosting.md
-/db/utils/README.md
+extras

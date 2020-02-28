@@ -119,33 +119,35 @@ const selectAllArticles = queryObj => {
       }
     })
     .then(articles => {
-      if (articles.length > 0) {
-        articles.forEach(article => {
-          delete article.body;
-          article.comment_count = +article.comment_count;
-        });
-        return articles;
-      } else {
-        if (queryObj.author) {
-          return checkIfExists('users', queryObj.author).then(res => {
-            if (res) {
-              return articles;
-            } else {
-              return Promise.reject({ status: 404, msg: '404 not found' });
-            }
+      return articlesTotalCount('articles', queryObj).then(total_count => {
+        if (articles.length > 0) {
+          articles.forEach(article => {
+            delete article.body;
+            article.comment_count = +article.comment_count;
           });
-        } else if (queryObj.topic) {
-          return checkIfExists('topics', queryObj.topic).then(res => {
-            if (res) {
-              return articles;
-            } else {
-              return Promise.reject({ status: 404, msg: '404 not found' });
-            }
-          });
+          return { articles, total_count };
         } else {
-          return Promise.reject({ status: 404, msg: '404 not found' });
+          if (queryObj.author) {
+            return checkIfExists('users', queryObj.author).then(res => {
+              if (res) {
+                return { articles, total_count };
+              } else {
+                return Promise.reject({ status: 404, msg: '404 not found' });
+              }
+            });
+          } else if (queryObj.topic) {
+            return checkIfExists('topics', queryObj.topic).then(res => {
+              if (res) {
+                return { articles, total_count };
+              } else {
+                return Promise.reject({ status: 404, msg: '404 not found' });
+              }
+            });
+          } else {
+            return Promise.reject({ status: 404, msg: '404 not found' });
+          }
         }
-      }
+      });
     });
 };
 
@@ -167,6 +169,21 @@ const checkIfExists = (queryTable, queryTerm) => {
       } else {
         return false;
       }
+    });
+};
+
+const articlesTotalCount = (table, queryObj) => {
+  return connection(table)
+    .count('*')
+    .modify(query => {
+      if (queryObj.author) {
+        query.where({ 'articles.author': queryObj.author });
+      } else if (queryObj.topic) {
+        query.where({ topic: queryObj.topic });
+      }
+    })
+    .then(res => {
+      return +res[0].count;
     });
 };
 

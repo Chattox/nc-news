@@ -49,7 +49,12 @@ const getAllComments = (req, res, next) => {
 const getAllArticles = (req, res, next) => {
   selectAllArticles(req.query)
     .then(articles => {
-      res.status(200).send({ articles });
+      res
+        .status(200)
+        .send({
+          articles: articles.articles,
+          total_count: articles.total_count
+        });
     })
     .catch(err => {
       next(err);
