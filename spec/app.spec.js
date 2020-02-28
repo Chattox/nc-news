@@ -440,6 +440,24 @@ describe('/api', () => {
                 expect(res.body.comments.length).to.eql(0);
               });
           });
+          it('GET: 200 - accepts limit query (default 10) which limits the amount of articles responded with to given amount', () => {
+            return request(app)
+              .get('/api/articles/1/comments?limit=5')
+              .expect(200)
+              .then(res => {
+                expect(res.body.comments.length).to.eql(5);
+              });
+          });
+          it('GET: 200 - accepts p query (default 1) which dictates which page of article results to respond with', () => {
+            return request(app)
+              .get('/api/articles/1/comments?limit=5&p=2')
+              .expect(200)
+              .then(res => {
+                expect(res.body.comments.length).to.eql(5);
+                expect(res.body.comments[0].comment_id).to.eql(7);
+                expect(res.body.comments[4].comment_id).to.eql(11);
+              });
+          });
           describe('GET errors', () => {
             it('GET: 404 - responds with 404 if attempting to get comments of article that does not exist', () => {
               return request(app)

@@ -60,6 +60,8 @@ const selectAllComments = (article_id, queryObj) => {
     .where({ article_id })
     .select('*')
     .orderBy(queryObj.sort_by || 'created_at', queryObj.order || 'desc')
+    .limit(+queryObj.limit || 10)
+    .offset((+queryObj.p - 1) * +queryObj.limit || 0)
     .then(comments => {
       if (
         queryObj.order !== undefined &&
